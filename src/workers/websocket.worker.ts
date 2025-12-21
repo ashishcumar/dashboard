@@ -1,6 +1,6 @@
 import type { ORDER_BOOK } from "../types/types";
 
-let TRADE_BUFFER_TIME = 100;
+const TRADE_BUFFER_TIME = 100;
 
 const batch = {
   trade: [],

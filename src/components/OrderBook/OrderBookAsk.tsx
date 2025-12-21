@@ -19,7 +19,8 @@ const OrderBookAsk = () => {
     if (!orderBook?.asks) return [];
     let cumulativeTotal = 0;
     const result = orderBook.asks.map(([price, quantity]) => {
-      cumulativeTotal += parseFloat(quantity);
+      const quantityNum = parseFloat(quantity);
+      cumulativeTotal += quantityNum;
       return { price, quantity, total: cumulativeTotal };
     });
     const maxTotal = result.length > 0 ? result[result.length - 1].total : 1;
@@ -35,7 +36,7 @@ const OrderBookAsk = () => {
       items={asksWithTotal}
       itemHeight={ORDERBOOK_ROW_HEIGHT}
       containerClassName="order-book-asks"
-      renderItem={(item: OrderBookItem, index, absoluteIndex) => {
+      renderItem={(item: OrderBookItem) => {
         return (
           <div
             className="order-book-ask"
@@ -54,9 +55,7 @@ const OrderBookAsk = () => {
             <div className="order-book-ask-quantity">
               {parseFloat(item.quantity).toFixed(5)}
             </div>
-            <div className="order-book-ask-total">
-              {item.total.toFixed(5)}
-            </div>
+            <div className="order-book-ask-total">{item.total.toFixed(5)}</div>
           </div>
         );
       }}

@@ -26,7 +26,7 @@ const MarketTrades = () => {
           itemHeight={TRADE_HEIGHT}
           containerClassName="market-trades-body-container"
           innerContainerClassName="market-trades-body-items-container"
-          renderItem={(item: TRADE, index, absoluteIndex) => {
+          renderItem={(item: TRADE) => {
             const isBuy = !item.m;
             return (
               <div

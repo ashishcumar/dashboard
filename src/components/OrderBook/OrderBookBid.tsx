@@ -20,7 +20,8 @@ const OrderBookBid = () => {
     let cumulativeTotal = 0;
 
     const result = orderBook.bids.map(([price, quantity]) => {
-      cumulativeTotal += parseFloat(quantity);
+      const quantityNum = parseFloat(quantity);
+      cumulativeTotal += quantityNum;
       return { price, quantity, total: cumulativeTotal };
     });
     const maxTotal = result.length > 0 ? result[result.length - 1].total : 1;
@@ -35,7 +36,7 @@ const OrderBookBid = () => {
       items={bidsWithTotal}
       itemHeight={ORDERBOOK_ROW_HEIGHT}
       containerClassName="order-book-bids"
-      renderItem={(item: OrderBookItem, index, absoluteIndex) => {
+      renderItem={(item: OrderBookItem) => {
         return (
           <div
             className="order-book-bid"

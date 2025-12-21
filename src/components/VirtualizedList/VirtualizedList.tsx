@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import "./VirtualizedList.css";
 
 interface VirtualizedListProps<T> {
   items: T[];
   itemHeight: number;
-  renderItem: (item: T, index: number, absoluteIndex: number) => React.ReactNode;
+  renderItem: (
+    item: T,
+    index: number,
+    absoluteIndex: number
+  ) => React.ReactNode;
   containerClassName?: string;
   innerContainerClassName?: string;
   bufferSize?: number;
@@ -21,25 +25,19 @@ const VirtualizedList = <T,>({
   const containerRef = useRef<HTMLDivElement>(null);
   const [startIndex, setStartIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(0);
-  const [itemsToRender, setItemsToRender] = useState<T[]>([]);
 
-  // Measure container height and calculate visible count
   useEffect(() => {
     if (!containerRef.current) return;
 
     const measureContainer = () => {
       if (containerRef.current && containerRef.current.clientHeight > 0) {
-        const count = Math.ceil(
-          containerRef.current.clientHeight / itemHeight
-        );
+        const count = Math.ceil(containerRef.current.clientHeight / itemHeight);
         setVisibleCount(count);
       }
     };
 
-    // Initial measurement
     measureContainer();
 
-    // Use ResizeObserver to detect when container gets height
     const resizeObserver = new ResizeObserver(measureContainer);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
@@ -51,8 +49,8 @@ const VirtualizedList = <T,>({
   }, [itemHeight]);
 
   // Calculate which items to render based on scroll position
-  useEffect(() => {
-    if (!visibleCount) return;
+  const itemsToRender = useMemo(() => {
+    if (!visibleCount) return [];
 
     const bufferStart = Math.max(0, startIndex - bufferSize);
     const bufferEnd = Math.min(
@@ -60,8 +58,7 @@ const VirtualizedList = <T,>({
       startIndex + visibleCount + bufferSize
     );
 
-    const sliced = items.slice(bufferStart, bufferEnd);
-    setItemsToRender(sliced);
+    return items.slice(bufferStart, bufferEnd);
   }, [startIndex, visibleCount, items, bufferSize]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
