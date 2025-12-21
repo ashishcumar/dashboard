@@ -25,15 +25,11 @@ class ErrorBoundary extends React.Component<
     };
   }
 
-  // This method is called when an error is caught
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
-  // This method is called after an error is caught (for logging)
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to console (in production, you'd send this to an error tracking service)
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({
       error,
