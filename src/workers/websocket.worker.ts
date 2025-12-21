@@ -1,9 +1,16 @@
+import type { ORDER_BOOK } from "../types/types";
+
 let TRADE_BUFFER_TIME = 100;
 
 const batch = {
   trade: [],
   orderBook: [],
   candlestick: [],
+};
+
+const orderBook = {
+  bids: new Map<string, string>(),
+  asks: new Map<string, string>(),
 };
 
 const connections: Record<string, WebSocket> = {};
@@ -14,12 +21,40 @@ const getBatchForStream = (stream: string) => {
 };
 
 const addToBatch = (stream: string, data: unknown) => {
-  console.log("addToBatch", stream, data);
   batch[stream as keyof typeof batch].push(data as never);
 };
 
 const clearBatch = (stream: string) => {
   batch[stream as keyof typeof batch] = [];
+};
+
+const updateOrderBook = (data: ORDER_BOOK) => {
+  if (data?.b?.length > 0) {
+    data.b.forEach(([price, quantity]) => {
+      if (quantity === "0.00000000") {
+        orderBook.bids.delete(price);
+      } else {
+        orderBook.bids.set(price, quantity);
+      }
+    });
+  }
+  if (data?.a?.length > 0) {
+    data.a.forEach(([price, quantity]) => {
+      if (quantity === "0.00000000") {
+        orderBook.asks.delete(price);
+      } else {
+        orderBook.asks.set(price, quantity);
+      }
+    });
+  }
+  return {
+    bids: Array.from(orderBook.bids.entries()).sort(
+      (a, b) => parseFloat(b[0]) - parseFloat(a[0])
+    ),
+    asks: Array.from(orderBook.asks.entries()).sort(
+      (a, b) => parseFloat(b[0]) - parseFloat(a[0])
+    ),
+  };
 };
 
 self.postMessage({ type: "RESULT", data: "Hello from the worker!" });
@@ -44,7 +79,12 @@ self.onmessage = (event) => {
     };
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      addToBatch(stream, data);
+      if (stream === "trade") {
+        addToBatch(stream, data);
+      } else if (stream === "orderBook") {
+        const orderBookData = updateOrderBook(data as ORDER_BOOK);
+        self.postMessage({ type: stream, data: orderBookData });
+      }
     };
   }
 };

@@ -9,3 +9,14 @@ export interface TRADE {
   m: boolean;
   M: boolean;
 }
+
+export interface ORDER_BOOK {
+  e: string; // event type
+  E: number; // event time
+  s: string; // symbol
+  U: number; // first update id
+  u: number; // last update id
+  b: [string, string][]; // bids
+  a: [string, string][]; // asks
+}
+

@@ -1,0 +1,51 @@
+:root {
+  /* Background Colors */
+  --bg-primary: #161A1E;
+  --bg-secondary: #1E2329;
+  --bg-tertiary: #1E2026;
+  --bg-card: #181A20;
+  --bg-elevated: #23282D;
+  --bg-dark: #252930;
+  --bg-panel: #2B2F36;
+  --bg-panel-light: #3A3F46;
+
+  /* Text Colors */
+  --text-primary: #EAECEF;
+  --text-secondary: #B7BDC6;
+  --text-tertiary: #848E9C;
+  --text-muted: #76808F;
+  --text-disabled: #474D57;
+  --text-dark: #C1C6CD;
+
+  /* Border Colors */
+  --border-primary: #2B3139;
+  --border-secondary: #3D4653;
+  --border-muted: #5E6673;
+
+  /* Primary Colors */
+  --color-green: #0ECB81;
+  --color-red: #F6465D;
+  --color-yellow: #F0B90B;
+  --color-yellow-bright: #FCD535;
+
+  /* Accent Colors */
+  --color-cyan: #74FCFD;
+  --color-magenta: #EA3DF7;
+  --color-orange: #F19C38;
+
+  /* Status Colors */
+  --status-green-solid: #0ECB81;
+  --status-green-light: rgba(14, 203, 129, 0.15);
+  --status-green-lightest: rgba(14, 203, 129, 0.10);
+  
+  --status-red-solid: #F6465D;
+  --status-red-light: rgba(246, 70, 93, 0.15);
+  --status-red-lightest: rgba(246, 70, 93, 0.10);
+  
+  --status-yellow-solid: #FCD535;
+  --status-yellow-light: rgba(252, 213, 53, 0.70);
+
+  /* Utility Colors */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+}

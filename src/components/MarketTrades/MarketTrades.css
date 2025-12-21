@@ -1,0 +1,112 @@
+.market-trades {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-primary);
+}
+
+.market-trades-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
+.market-trades-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.market-trades-body-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 4px 16px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
+  align-items: center;
+}
+
+.market-trades-body-row:first-child {
+  background-color: var(--bg-card);
+  color: var(--text-tertiary);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.market-trades-body-row-cell {
+  text-align: right;
+}
+
+.market-trades-body-row-cell:first-child {
+  text-align: left;
+}
+
+.market-trades-body-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  background-color: var(--bg-secondary);
+}
+
+.market-trades-body-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.market-trades-body-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.market-trades-body-container::-webkit-scrollbar-thumb {
+  background: var(--border-muted);
+  border-radius: 3px;
+}
+
+.market-trades-body-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+.market-trades-body-items-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Trade row styling */
+.market-trades-body-row.trade-row {
+  color: var(--text-primary);
+  transition: background-color 0.1s ease;
+}
+
+.market-trades-body-row.trade-row:hover {
+  background-color: var(--bg-panel);
+}
+
+.market-trades-body-row.trade-row .trade-price {
+  font-weight: 500;
+}
+
+.market-trades-body-row.trade-row.buy .trade-price {
+  color: var(--color-green);
+}
+
+.market-trades-body-row.trade-row.sell .trade-price {
+  color: var(--color-red);
+}
+
+.market-trades-body-row.trade-row .trade-amount {
+  color: var(--text-primary);
+}
+
+.market-trades-body-row.trade-row .trade-time {
+  color: var(--text-tertiary);
+}
