@@ -10,7 +10,7 @@ import OrderBook from "./components/OrderBook/OrderBook";
 
 function App() {
   const [trades, setTrades] = useAtom(tradesAtom);
-  const [orderBook, setOrderBook] = useAtom(orderBookAtom);
+  const [, setOrderBook] = useAtom(orderBookAtom);
 
   useEffect(() => {
     const worker = new Worker(
@@ -58,8 +58,25 @@ function App() {
   return (
     <div className="app">
       <Header currentPrice={currentPrice} />
-      {/* <MarketTrades /> */}
-      <OrderBook />
+      <div className="app-main-content">
+        {/* Left: Order Book (30%) */}
+        <div className="app-section-orderbook">
+          <OrderBook />
+        </div>
+        {/* Center: Candlestick Chart (50%) */}
+        <div className="app-section-chart">
+          <div className="chart-placeholder">
+            <p>Candlestick Chart</p>
+            <p style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
+              Coming soon...
+            </p>
+          </div>
+        </div>
+        {/* Right: Market Trades (20%) */}
+        <div className="app-section-trades">
+          <MarketTrades />
+        </div>
+      </div>
     </div>
   );
 }

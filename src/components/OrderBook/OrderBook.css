@@ -3,6 +3,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .order-book-container {
@@ -52,6 +53,8 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   color: var(--text-primary);
+  position: relative;
+  z-index: 1;
 }
 
 .order-book-ask-price {
@@ -60,4 +63,30 @@
 
 .order-book-bid-price {
   color: var(--color-green);
+}
+
+.order-book-ask::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: var(--depth-percentage);
+  background-color: var(--status-red-light);
+  z-index: 0;
+  pointer-events: none;
+  transition: width 0.15s ease-out;
+}
+
+.order-book-bid::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: var(--depth-percentage);
+  background-color: var(--status-green-light);
+  z-index: 0;
+  pointer-events: none;
+  transition: width 0.15s ease-out;
 }
