@@ -1,4 +1,3 @@
-import React from 'react';
 import { FiStar, FiMoreHorizontal, FiSettings } from 'react-icons/fi';
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { theme } from '../../theme';
