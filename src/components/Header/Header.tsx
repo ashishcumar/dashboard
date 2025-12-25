@@ -1,4 +1,3 @@
-import React from 'react';
 import { FiStar, FiMoreHorizontal, FiSettings } from 'react-icons/fi';
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { theme } from '../../theme';
@@ -20,7 +19,7 @@ function Header({
   high24h = '89,399.97',
   low24h = '86,846.16',
   volume24h = '15,528.21',
-}: HeaderProps) {
+}: Readonly<HeaderProps>) {
   const isPositive = priceChange24h >= 0;
   const changeColor = isPositive ? theme.colors.primary.green : theme.colors.primary.red;
 

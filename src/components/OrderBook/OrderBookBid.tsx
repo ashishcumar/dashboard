@@ -35,7 +35,7 @@ const OrderBookBid = () => {
       items={bidsWithTotal}
       itemHeight={ORDERBOOK_ROW_HEIGHT}
       containerClassName="order-book-bids"
-      renderItem={(item: OrderBookItem, index, absoluteIndex) => {
+      renderItem={(item: OrderBookItem) => {
         return (
           <div
             className="order-book-bid"

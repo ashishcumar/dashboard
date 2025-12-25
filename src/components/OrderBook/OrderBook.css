@@ -90,3 +90,10 @@
   pointer-events: none;
   transition: width 0.15s ease-out;
 }
+
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 8px 12px;
+}

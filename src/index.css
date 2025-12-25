@@ -17,5 +17,3 @@ body {
   color: var(--text-primary);
 }
 
-/* Import monospaced font for numbers */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');

@@ -23,7 +23,6 @@ const VirtualizedList = <T,>({
   const [visibleCount, setVisibleCount] = useState(0);
   const [itemsToRender, setItemsToRender] = useState<T[]>([]);
 
-  // Measure container height and calculate visible count
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -36,10 +35,8 @@ const VirtualizedList = <T,>({
       }
     };
 
-    // Initial measurement
     measureContainer();
 
-    // Use ResizeObserver to detect when container gets height
     const resizeObserver = new ResizeObserver(measureContainer);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
@@ -50,7 +47,6 @@ const VirtualizedList = <T,>({
     };
   }, [itemHeight]);
 
-  // Calculate which items to render based on scroll position
   useEffect(() => {
     if (!visibleCount) return;
 

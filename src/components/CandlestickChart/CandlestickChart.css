@@ -1,0 +1,128 @@
+.candlestick-chart {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+}
+
+.candlestick-chart canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  min-height: 0;
+}
+
+.chart-controls {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-primary);
+  background-color: var(--bg-primary);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.timeframe-selector {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.timeframe-btn {
+  padding: 6px 12px;
+  background-color: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: "JetBrains Mono", monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+
+.timeframe-btn:hover {
+  background-color: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.timeframe-btn.active {
+  background-color: var(--color-yellow);
+  color: var(--bg-primary);
+  border-color: var(--color-yellow);
+  font-weight: 600;
+}
+
+.chart-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.chart-info-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.info-date {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.info-label {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.info-value.positive {
+  color: var(--color-green);
+}
+
+.info-value.negative {
+  color: var(--color-red);
+}
+
+.info-value.ma-7 {
+  color: #FCD535;
+}
+
+.info-value.ma-25 {
+  color: #A792EE;
+}
+
+.info-value.ma-99 {
+  color: #74FCFD;
+}
+
+.price-tooltip {
+  position: absolute;
+  background-color: rgba(30, 35, 41, 0.95);
+  border: 1px solid var(--border-secondary);
+  padding: 6px 10px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1000;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -100%);
+}
+
+.price-tooltip div {
+  white-space: nowrap;
+  line-height: 1.4;
+}
