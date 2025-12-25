@@ -22,12 +22,12 @@
 ## 📸 Screenshots
 
 ### Dashboard Interface
-![Dashboard Screenshot](./dashboard-screenshot.png)
+![Dashboard Screenshot](./websiteLandingPage.png)
 
 *Real-time cryptocurrency trading dashboard showing BTC/USDT pair with live order book, candlestick chart, and market trades.*
 
 ### Performance Metrics
-![Lighthouse Performance Report](./lighthouse-performance.png)
+![Lighthouse Performance Report](./websiteScore.png)
 
 *Lighthouse performance report showing excellent scores: Performance 99, Best Practices 96, SEO 100, and Accessibility 82.*
 
