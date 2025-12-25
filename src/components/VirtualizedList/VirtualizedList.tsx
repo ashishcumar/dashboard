@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./VirtualizedList.css";
 
 interface VirtualizedListProps<T> {
@@ -25,7 +25,6 @@ const VirtualizedList = <T,>({
   const containerRef = useRef<HTMLDivElement>(null);
   const [startIndex, setStartIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(0);
-  const [itemsToRender, setItemsToRender] = useState<T[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -49,8 +48,8 @@ const VirtualizedList = <T,>({
     };
   }, [itemHeight]);
 
-  useEffect(() => {
-    if (!visibleCount) return;
+  const itemsToRender = useMemo(() => {
+    if (!visibleCount) return [];
 
     const bufferStart = Math.max(0, startIndex - bufferSize);
     const bufferEnd = Math.min(
@@ -58,8 +57,7 @@ const VirtualizedList = <T,>({
       startIndex + visibleCount + bufferSize
     );
 
-    const sliced = items.slice(bufferStart, bufferEnd);
-    setItemsToRender(sliced);
+    return items.slice(bufferStart, bufferEnd);
   }, [startIndex, visibleCount, items, bufferSize]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
