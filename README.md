@@ -11,7 +11,25 @@
 
 [Features](#-features) • [Tech Stack](#-tech-stack) • [Performance](#-performance) • [Getting Started](#-getting-started) • [Project Structure](#-project-structure)
 
+### 🌐 Live Demo
+
+**👉 [View Live Dashboard](https://ashishcumar.github.io/dashboard/)**
+
 </div>
+
+---
+
+## 📸 Screenshots
+
+### Dashboard Interface
+![Dashboard Screenshot](./dashboard-screenshot.png)
+
+*Real-time cryptocurrency trading dashboard showing BTC/USDT pair with live order book, candlestick chart, and market trades.*
+
+### Performance Metrics
+![Lighthouse Performance Report](./lighthouse-performance.png)
+
+*Lighthouse performance report showing excellent scores: Performance 99, Best Practices 96, SEO 100, and Accessibility 82.*
 
 ---
 
