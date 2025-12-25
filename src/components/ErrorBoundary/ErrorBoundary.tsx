@@ -1,74 +1,32 @@
-import React from "react";
-import "./ErrorBoundary.css";
+import { Component, type ReactNode } from "react";
 
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
+interface Props {
+  children: ReactNode;
 }
 
-interface ErrorBoundaryState {
+interface State {
   hasError: boolean;
-  error: Error | null;
-  errorInfo: React.ErrorInfo | null;
 }
 
-class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
-  constructor(props: ErrorBoundaryProps) {
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { hasError: true, error };
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    this.setState({
-      error,
-      errorInfo,
-    });
   }
 
   render() {
     if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-
-      return (
-        <div className="error-boundary">
-          <div className="error-boundary-content">
-            <h2>Something went wrong</h2>
-            <p>We're sorry, but something unexpected happened.</p>
-            {import.meta.env.DEV && this.state.error && (
-              <details className="error-boundary-details">
-                <summary>Error Details (Development Only)</summary>
-                <pre>{this.state.error.toString()}</pre>
-                {this.state.errorInfo && (
-                  <pre>{this.state.errorInfo.componentStack}</pre>
-                )}
-              </details>
-            )}
-            <button
-              className="error-boundary-button"
-              onClick={() => window.location.reload()}
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
-      );
+      return null;
     }
 
-    // If no error, render children normally
     return this.props.children;
   }
 }

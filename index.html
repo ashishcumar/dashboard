@@ -2,9 +2,111 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dashboard</title>
+    <meta
+      name="description"
+      content="Binance - High-Performance Crypto Trading Dashboard with real-time market data visualization"
+    />
+    <title>Binance - Crypto Trading Dashboard</title>
+
+    <link rel="preconnect" href="https://stream.binance.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://stream.binance.com" />
+
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #161a1e;
+        color: #eaecef;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+          "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow: hidden;
+      }
+
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background-color: #161a1e;
+        overflow: hidden;
+      }
+
+      .app-main-content {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        overflow: hidden;
+        gap: 1px;
+        background-color: #2b3139;
+      }
+
+      .app-main-content > * {
+        background-color: #161a1e;
+      }
+
+      .app-section-orderbook {
+        width: 320px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .app-section-chart {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .app-section-trades {
+        width: 280px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      [data-react-error],
+      [data-error-boundary],
+      .error-boundary,
+      .react-error-overlay {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

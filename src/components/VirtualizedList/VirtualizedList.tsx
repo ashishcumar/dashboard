@@ -48,9 +48,8 @@ const VirtualizedList = <T,>({
     };
   }, [itemHeight]);
 
-  // Calculate which items to render based on scroll position
-  const itemsToRender = useMemo(() => {
-    if (!visibleCount) return [];
+  useEffect(() => {
+    if (!visibleCount) return;
 
     const bufferStart = Math.max(0, startIndex - bufferSize);
     const bufferEnd = Math.min(

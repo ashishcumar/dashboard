@@ -1,49 +1,120 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { TRADE_BUFFER_SIZE } from "./utils/constants";
 import Header from "./components/Header/Header";
+import HeaderSkeleton from "./components/Header/HeaderSkeleton";
 import { useAtom } from "jotai";
 import { tradesAtom } from "./atoms/trades";
 import { orderBookAtom } from "./atoms/orderBook";
 import MarketTrades from "./components/MarketTrades/MarketTrades";
+import MarketTradesSkeleton from "./components/MarketTrades/MarketTradesSkeleton";
 import OrderBook from "./components/OrderBook/OrderBook";
+import OrderBookSkeleton from "./components/OrderBook/OrderBookSkeleton";
+import CandlestickChart from "./components/CandlestickChart/CandlestickChart";
+import CandlestickChartSkeleton from "./components/CandlestickChart/CandlestickChartSkeleton";
+import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 
 function App() {
   const [trades, setTrades] = useAtom(tradesAtom);
-  const [, setOrderBook] = useAtom(orderBookAtom);
+  const [orderBook, setOrderBook] = useAtom(orderBookAtom);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const worker = new Worker(
-      new URL("./workers/websocket.worker.ts", import.meta.url)
-    );
-    worker.onmessage = (event) => {
-      const { type, data } = event.data;
-      if (type === "trade") {
-        setTrades((prev) => {
-          if (prev.length + data.length > TRADE_BUFFER_SIZE) {
-            return [...prev, ...data].slice(-TRADE_BUFFER_SIZE);
-          } else {
-            return [...prev, ...data];
+    let worker: Worker | null = null;
+    let hasReceivedData = false;
+
+    try {
+      worker = new Worker(
+        new URL("./workers/websocket.worker.ts", import.meta.url)
+      );
+
+      worker.onmessage = (event) => {
+        try {
+          const { type, data, error } = event.data;
+
+          if (type === "ERROR") {
+            if (error && typeof error === "string") {
+              console.error("Worker error:", error);
+            }
+            if (!hasReceivedData) {
+              setIsLoading(false);
+            }
+            return;
           }
-        });
-      }
-      if (type === "orderBook") {
-        setOrderBook(data);
-      }
-    };
-    worker.postMessage({
-      type: "CONNECT",
-      data: "wss://stream.binance.com:9443/ws/btcusdt@trade",
-      stream: "trade",
-    });
-    worker.postMessage({
-      type: "CONNECT",
-      data: "wss://stream.binance.com:9443/ws/btcusdt@depth@100ms",
-      stream: "orderBook",
-    });
+
+          if (type === "trade") {
+            if (!hasReceivedData) {
+              hasReceivedData = true;
+              setIsLoading(false);
+            }
+            if (Array.isArray(data)) {
+              setTrades((prev) => {
+                if (prev.length + data.length > TRADE_BUFFER_SIZE) {
+                  return [...prev, ...data].slice(-TRADE_BUFFER_SIZE);
+                } else {
+                  return [...prev, ...data];
+                }
+              });
+            }
+          }
+
+          if (type === "orderBook") {
+            if (data && (data.bids || data.asks)) {
+              setOrderBook(data);
+              if (!hasReceivedData) {
+                hasReceivedData = true;
+                setIsLoading(false);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error processing worker message:", error);
+        }
+      };
+
+      worker.onerror = (error) => {
+        if (error.message) {
+          console.error("Worker error:", error.message);
+        }
+        setIsLoading(false);
+        error.preventDefault?.();
+        return true;
+      };
+
+      worker.postMessage({
+        type: "CONNECT",
+        data: "wss://stream.binance.com:9443/ws/btcusdt@trade",
+        stream: "trade",
+      });
+      worker.postMessage({
+        type: "CONNECT",
+        data: "wss://stream.binance.com:9443/ws/btcusdt@depth@100ms",
+        stream: "orderBook",
+      });
+
+      const timeout = setTimeout(() => {
+        if (!hasReceivedData) {
+          setIsLoading(false);
+        }
+      }, 3000);
+
+      return () => {
+        clearTimeout(timeout);
+        if (worker) {
+          worker.terminate();
+        }
+      };
+    } catch (error) {
+      console.error("Error creating worker:", error);
+      setIsLoading(false);
+      return () => {
+        if (worker) {
+          worker.terminate();
+        }
+      };
+    }
   }, []);
 
-  // Calculate current price from latest trade
   const currentPrice =
     trades.length > 0
       ? parseFloat(trades[trades.length - 1].p).toLocaleString("en-US", {
@@ -52,32 +123,44 @@ function App() {
         })
       : undefined;
 
- 
-  // console.log("orderBook --->", orderBook); console.log("trades --->", trades);
+  const hasData =
+    trades.length > 0 ||
+    (orderBook && (orderBook.bids?.length > 0 || orderBook.asks?.length > 0));
+  const showSkeletons = isLoading || !hasData;
 
   return (
-    <div className="app">
-      <Header currentPrice={currentPrice} />
-      <div className="app-main-content">
-        {/* Left: Order Book (30%) */}
-        <div className="app-section-orderbook">
-          <OrderBook />
-        </div>
-        {/* Center: Candlestick Chart (50%) */}
-        <div className="app-section-chart">
-          <div className="chart-placeholder">
-            <p>Candlestick Chart</p>
-            <p style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
-              Coming soon...
-            </p>
-          </div>
-        </div>
-        {/* Right: Market Trades (20%) */}
-        <div className="app-section-trades">
-          <MarketTrades />
+    <ErrorBoundary>
+      <div className="app">
+        <ErrorBoundary>
+          {showSkeletons ? (
+            <HeaderSkeleton />
+          ) : (
+            <Header currentPrice={currentPrice} />
+          )}
+        </ErrorBoundary>
+        <div className="app-main-content">
+          <ErrorBoundary>
+            <div className="app-section-orderbook">
+              {showSkeletons ? <OrderBookSkeleton /> : <OrderBook />}
+            </div>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <div className="app-section-chart">
+              {showSkeletons ? (
+                <CandlestickChartSkeleton />
+              ) : (
+                <CandlestickChart />
+              )}
+            </div>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <div className="app-section-trades">
+              {showSkeletons ? <MarketTradesSkeleton /> : <MarketTrades />}
+            </div>
+          </ErrorBoundary>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
 

@@ -4,11 +4,16 @@ import "./MarketTrades.css";
 import { formatTime } from "../../utils/helper";
 import type { TRADE } from "../../types/types";
 import VirtualizedList from "../VirtualizedList/VirtualizedList";
+import { useMemo } from "react";
 
 const TRADE_HEIGHT = 35;
 
 const MarketTrades = () => {
   const [trades] = useAtom(tradesAtom);
+
+  const reversedTrades = useMemo(() => {
+    return [...trades].reverse();
+  }, [trades]);
 
   return (
     <div className="market-trades">
@@ -22,7 +27,7 @@ const MarketTrades = () => {
         </div>
 
         <VirtualizedList
-          items={trades}
+          items={reversedTrades}
           itemHeight={TRADE_HEIGHT}
           containerClassName="market-trades-body-container"
           innerContainerClassName="market-trades-body-items-container"

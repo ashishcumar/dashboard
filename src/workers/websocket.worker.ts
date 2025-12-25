@@ -49,10 +49,10 @@ const updateOrderBook = (data: ORDER_BOOK) => {
   }
   return {
     bids: Array.from(orderBook.bids.entries()).sort(
-      (a, b) => parseFloat(b[0]) - parseFloat(a[0])
+      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
     ),
     asks: Array.from(orderBook.asks.entries()).sort(
-      (a, b) => parseFloat(b[0]) - parseFloat(a[0])
+      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
     ),
   };
 };
@@ -60,31 +60,117 @@ const updateOrderBook = (data: ORDER_BOOK) => {
 self.postMessage({ type: "RESULT", data: "Hello from the worker!" });
 
 self.onmessage = (event) => {
-  const { type, data, stream } = event.data;
-  if (type === "CONNECT") {
-    const ws = new WebSocket(data);
-    connections[stream] = ws;
+  try {
+    const { type, data, stream } = event.data;
+    if (type === "CONNECT") {
+      try {
+        const ws = new WebSocket(data);
+        connections[stream] = ws;
 
-    ws.onopen = () => {
-      if (intervals[stream]) {
-        clearInterval(intervals[stream]);
+        ws.onopen = () => {
+          try {
+            if (intervals[stream]) {
+              clearInterval(intervals[stream]);
+            }
+            intervals[stream] = setInterval(() => {
+              try {
+                const batch = getBatchForStream(stream);
+                if (batch.length > 0) {
+                  self.postMessage({ type: stream, data: batch });
+                  clearBatch(stream);
+                }
+              } catch (error) {
+                console.error(
+                  `Error in batch processing for ${stream}:`,
+                  error
+                );
+              }
+            }, TRADE_BUFFER_TIME);
+          } catch (error) {
+            console.error(`Error setting up interval for ${stream}:`, error);
+            self.postMessage({
+              type: "ERROR",
+              stream,
+              error: "Failed to setup interval",
+            });
+          }
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const parsedData = JSON.parse(event.data);
+            if (stream === "trade") {
+              addToBatch(stream, parsedData);
+            } else if (stream === "orderBook") {
+              const orderBookData = updateOrderBook(parsedData as ORDER_BOOK);
+              self.postMessage({ type: stream, data: orderBookData });
+            }
+          } catch (error) {
+            console.error(`Error parsing message for ${stream}:`, error);
+            self.postMessage({
+              type: "ERROR",
+              stream,
+              error: "Failed to parse message",
+            });
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error(`WebSocket error for ${stream}:`, error);
+          self.postMessage({
+            type: "ERROR",
+            stream,
+            error: "WebSocket connection error",
+          });
+        };
+
+        ws.onclose = (event) => {
+          if (intervals[stream]) {
+            clearInterval(intervals[stream]);
+            delete intervals[stream];
+          }
+          if (event.code !== 1000) {
+            console.warn(
+              `WebSocket closed unexpectedly for ${stream}:`,
+              event.code,
+              event.reason
+            );
+            self.postMessage({
+              type: "ERROR",
+              stream,
+              error: `Connection closed: ${event.reason || event.code}`,
+            });
+          }
+        };
+      } catch (error) {
+        console.error(`Error creating WebSocket for ${stream}:`, error);
+        self.postMessage({
+          type: "ERROR",
+          stream,
+          error: "Failed to create WebSocket",
+        });
       }
-      intervals[stream] = setInterval(() => {
-        const batch = getBatchForStream(stream);
-        if (batch.length > 0) {
-          self.postMessage({ type: stream, data: batch });
-          clearBatch(stream);
-        }
-      }, TRADE_BUFFER_TIME);
-    };
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (stream === "trade") {
-        addToBatch(stream, data);
-      } else if (stream === "orderBook") {
-        const orderBookData = updateOrderBook(data as ORDER_BOOK);
-        self.postMessage({ type: stream, data: orderBookData });
-      }
-    };
+    }
+  } catch (error) {
+    console.error("Error in worker message handler:", error);
+    self.postMessage({ type: "ERROR", error: "Unknown error in worker" });
   }
+};
+
+self.onerror = (error) => {
+  try {
+    console.error("Worker error:", error);
+    self.postMessage({ type: "ERROR", error: "Worker encountered an error" });
+  } catch (e) {}
+  return true;
+};
+
+self.onunhandledrejection = (event) => {
+  try {
+    console.error("Unhandled promise rejection in worker:", event.reason);
+    self.postMessage({ type: "ERROR", error: "Unhandled promise rejection" });
+    event.preventDefault();
+    event.stopPropagation();
+  } catch (e) {}
+  return true;
 };

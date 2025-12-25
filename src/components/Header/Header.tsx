@@ -1,7 +1,7 @@
-import { FiStar, FiMoreHorizontal, FiSettings } from 'react-icons/fi';
-import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
-import { theme } from '../../theme';
-import './Header.css';
+import { FiStar, FiMoreHorizontal, FiSettings } from "react-icons/fi";
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { theme } from "../../theme";
+import "./Header.css";
 
 interface HeaderProps {
   currentPrice?: string;
@@ -13,15 +13,17 @@ interface HeaderProps {
 }
 
 function Header({
-  currentPrice = '88,304.27',
+  currentPrice = "88,304.27",
   priceChange24h = 276.05,
   priceChangePercent24h = 0.31,
-  high24h = '89,399.97',
-  low24h = '86,846.16',
-  volume24h = '15,528.21',
-}: HeaderProps) {
+  high24h = "89,399.97",
+  low24h = "86,846.16",
+  volume24h = "15,528.21",
+}: Readonly<HeaderProps>) {
   const isPositive = priceChange24h >= 0;
-  const changeColor = isPositive ? theme.colors.primary.green : theme.colors.primary.red;
+  const changeColor = isPositive
+    ? theme.colors.primary.green
+    : theme.colors.primary.red;
 
   return (
     <header className="header">
@@ -32,12 +34,17 @@ function Header({
             <FiStar size={16} />
           </button>
         </div>
-        
+
         <div className="price-section">
           <span className="current-price">{currentPrice}</span>
           <span className="price-change" style={{ color: changeColor }}>
-            {isPositive ? <MdKeyboardArrowUp size={20} /> : <MdKeyboardArrowDown size={20} />}
-            {Math.abs(priceChange24h).toLocaleString()} ({Math.abs(priceChangePercent24h).toFixed(2)}%)
+            {isPositive ? (
+              <MdKeyboardArrowUp size={20} />
+            ) : (
+              <MdKeyboardArrowDown size={20} />
+            )}
+            {Math.abs(priceChange24h).toLocaleString()} (
+            {Math.abs(priceChangePercent24h).toFixed(2)}%)
           </span>
         </div>
       </div>
