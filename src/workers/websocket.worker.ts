@@ -9,8 +9,11 @@ const batch = {
 };
 
 const orderBook = {
-  bids: new Map<string, string>(),
-  asks: new Map<string, string>(),
+  bids: new Map<number, string>(),
+  asks: new Map<number, string>(),
+
+  bidsArray: [] as [number, string][],
+  asksArray: [] as [number, string][],
 };
 
 const connections: Record<string, WebSocket> = {};
@@ -29,31 +32,37 @@ const clearBatch = (stream: string) => {
 };
 
 const updateOrderBook = (data: ORDER_BOOK) => {
+  // Batch updates: collect all changes first, then apply once
   if (data?.b?.length > 0) {
+    // Update Map first
     data.b.forEach(([price, quantity]) => {
+      const numPrice = Number(price);
       if (quantity === "0.00000000") {
-        orderBook.bids.delete(price);
+        orderBook.bids.delete(numPrice);
       } else {
-        orderBook.bids.set(price, quantity);
+        orderBook.bids.set(numPrice, quantity);
       }
     });
+    // Rebuild sorted array from Map (faster than incremental updates for many changes)
+    orderBook.bidsArray = Array.from(orderBook.bids.entries()).sort((a, b) => a[0] - b[0]);
   }
   if (data?.a?.length > 0) {
+    // Update Map first
     data.a.forEach(([price, quantity]) => {
+      const numPrice = Number(price);
       if (quantity === "0.00000000") {
-        orderBook.asks.delete(price);
+        orderBook.asks.delete(numPrice);
       } else {
-        orderBook.asks.set(price, quantity);
+        orderBook.asks.set(numPrice, quantity);
       }
     });
+    // Rebuild sorted array from Map (faster than incremental updates for many changes)
+    orderBook.asksArray = Array.from(orderBook.asks.entries()).sort((a, b) => a[0] - b[0]);
   }
+  
   return {
-    bids: Array.from(orderBook.bids.entries()).sort(
-      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
-    ),
-    asks: Array.from(orderBook.asks.entries()).sort(
-      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
-    ),
+    bids: orderBook.bidsArray,
+    asks: orderBook.asksArray,
   };
 };
 
@@ -80,12 +89,19 @@ self.onmessage = (event) => {
                   clearBatch(stream);
                 }
               } catch (error) {
-                console.error(`Error in batch processing for ${stream}:`, error);
+                console.error(
+                  `Error in batch processing for ${stream}:`,
+                  error
+                );
               }
             }, TRADE_BUFFER_TIME);
           } catch (error) {
             console.error(`Error setting up interval for ${stream}:`, error);
-            self.postMessage({ type: "ERROR", stream, error: "Failed to setup interval" });
+            self.postMessage({
+              type: "ERROR",
+              stream,
+              error: "Failed to setup interval",
+            });
           }
         };
 
@@ -100,13 +116,21 @@ self.onmessage = (event) => {
             }
           } catch (error) {
             console.error(`Error parsing message for ${stream}:`, error);
-            self.postMessage({ type: "ERROR", stream, error: "Failed to parse message" });
+            self.postMessage({
+              type: "ERROR",
+              stream,
+              error: "Failed to parse message",
+            });
           }
         };
 
         ws.onerror = (error) => {
           console.error(`WebSocket error for ${stream}:`, error);
-          self.postMessage({ type: "ERROR", stream, error: "WebSocket connection error" });
+          self.postMessage({
+            type: "ERROR",
+            stream,
+            error: "WebSocket connection error",
+          });
         };
 
         ws.onclose = (event) => {
@@ -115,13 +139,25 @@ self.onmessage = (event) => {
             delete intervals[stream];
           }
           if (event.code !== 1000) {
-            console.warn(`WebSocket closed unexpectedly for ${stream}:`, event.code, event.reason);
-            self.postMessage({ type: "ERROR", stream, error: `Connection closed: ${event.reason || event.code}` });
+            console.warn(
+              `WebSocket closed unexpectedly for ${stream}:`,
+              event.code,
+              event.reason
+            );
+            self.postMessage({
+              type: "ERROR",
+              stream,
+              error: `Connection closed: ${event.reason || event.code}`,
+            });
           }
         };
       } catch (error) {
         console.error(`Error creating WebSocket for ${stream}:`, error);
-        self.postMessage({ type: "ERROR", stream, error: "Failed to create WebSocket" });
+        self.postMessage({
+          type: "ERROR",
+          stream,
+          error: "Failed to create WebSocket",
+        });
       }
     }
   } catch (error) {
@@ -135,7 +171,7 @@ self.onerror = (error) => {
     console.error("Worker error:", error);
     self.postMessage({ type: "ERROR", error: "Worker encountered an error" });
   } catch (e) {
-
+    console.error("Worker error:", e);
   }
   return true;
 };
@@ -147,7 +183,7 @@ self.onunhandledrejection = (event) => {
     event.preventDefault();
     event.stopPropagation();
   } catch (e) {
-
+    console.error("Unhandled promise rejection in worker:", e);
   }
   return true;
 };
