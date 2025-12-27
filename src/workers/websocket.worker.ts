@@ -9,8 +9,11 @@ const batch = {
 };
 
 const orderBook = {
-  bids: new Map<string, string>(),
-  asks: new Map<string, string>(),
+  bids: new Map<number, string>(),
+  asks: new Map<number, string>(),
+
+  bidsArray: [] as [number, string][],
+  asksArray: [] as [number, string][],
 };
 
 const connections: Record<string, WebSocket> = {};
@@ -25,35 +28,45 @@ const addToBatch = (stream: string, data: unknown) => {
 };
 
 const clearBatch = (stream: string) => {
-  batch[stream as keyof typeof batch] = [];
+  const arr = batch[stream as keyof typeof batch];
+  if (Array.isArray(arr)) {
+    arr.length = 0;
+  }
 };
 
 const updateOrderBook = (data: ORDER_BOOK) => {
   if (data?.b?.length > 0) {
     data.b.forEach(([price, quantity]) => {
+      const numPrice = Number(price);
       if (quantity === "0.00000000") {
-        orderBook.bids.delete(price);
+        orderBook.bids.delete(numPrice);
       } else {
-        orderBook.bids.set(price, quantity);
+        orderBook.bids.set(numPrice, quantity);
       }
     });
+
+    orderBook.bidsArray = Array.from(orderBook.bids.entries()).sort(
+      (a, b) => a[0] - b[0]
+    );
   }
   if (data?.a?.length > 0) {
     data.a.forEach(([price, quantity]) => {
+      const numPrice = Number(price);
       if (quantity === "0.00000000") {
-        orderBook.asks.delete(price);
+        orderBook.asks.delete(numPrice);
       } else {
-        orderBook.asks.set(price, quantity);
+        orderBook.asks.set(numPrice, quantity);
       }
     });
+
+    orderBook.asksArray = Array.from(orderBook.asks.entries()).sort(
+      (a, b) => a[0] - b[0]
+    );
   }
+
   return {
-    bids: Array.from(orderBook.bids.entries()).sort(
-      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
-    ),
-    asks: Array.from(orderBook.asks.entries()).sort(
-      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
-    ),
+    bids: orderBook.bidsArray,
+    asks: orderBook.asksArray,
   };
 };
 
@@ -161,7 +174,9 @@ self.onerror = (error) => {
   try {
     console.error("Worker error:", error);
     self.postMessage({ type: "ERROR", error: "Worker encountered an error" });
-  } catch (e) {}
+  } catch (e) {
+    console.error("Worker error:", e);
+  }
   return true;
 };
 
@@ -171,6 +186,8 @@ self.onunhandledrejection = (event) => {
     self.postMessage({ type: "ERROR", error: "Unhandled promise rejection" });
     event.preventDefault();
     event.stopPropagation();
-  } catch (e) {}
+  } catch (e) {
+    console.error("Unhandled promise rejection in worker:", e);
+  }
   return true;
 };

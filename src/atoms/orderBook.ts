@@ -2,8 +2,8 @@ import { atom } from "jotai";
 
 export const orderBookAtom = atom<
   | {
-      bids: [string, string][];
-      asks: [string, string][];
+      bids: [number, string][];
+      asks: [number, string][];
     }
   | undefined
 >(undefined);

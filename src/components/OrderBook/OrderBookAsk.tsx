@@ -6,7 +6,7 @@ import VirtualizedList from "../VirtualizedList/VirtualizedList";
 const ORDERBOOK_ROW_HEIGHT = 35;
 
 type OrderBookItem = {
-  price: string;
+  price: number;
   quantity: string;
   total: number;
   percentage: number;
@@ -47,13 +47,13 @@ const OrderBookAsk = () => {
             }
           >
             <div className="order-book-ask-price">
-              {parseFloat(item.price).toLocaleString("en-US", {
+              {item.price.toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
             </div>
             <div className="order-book-ask-quantity">
-              {parseFloat(item.quantity).toFixed(5)}
+              {Number(item.quantity).toFixed(5)}
             </div>
             <div className="order-book-ask-total">{item.total.toFixed(5)}</div>
           </div>
