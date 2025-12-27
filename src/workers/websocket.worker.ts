@@ -28,13 +28,15 @@ const addToBatch = (stream: string, data: unknown) => {
 };
 
 const clearBatch = (stream: string) => {
-  batch[stream as keyof typeof batch] = [];
+  const arr = batch[stream as keyof typeof batch];
+  if (Array.isArray(arr)) {
+    arr.length = 0;
+  }
 };
 
 const updateOrderBook = (data: ORDER_BOOK) => {
-  // Batch updates: collect all changes first, then apply once
+
   if (data?.b?.length > 0) {
-    // Update Map first
     data.b.forEach(([price, quantity]) => {
       const numPrice = Number(price);
       if (quantity === "0.00000000") {
@@ -43,11 +45,11 @@ const updateOrderBook = (data: ORDER_BOOK) => {
         orderBook.bids.set(numPrice, quantity);
       }
     });
-    // Rebuild sorted array from Map (faster than incremental updates for many changes)
+
     orderBook.bidsArray = Array.from(orderBook.bids.entries()).sort((a, b) => a[0] - b[0]);
   }
   if (data?.a?.length > 0) {
-    // Update Map first
+
     data.a.forEach(([price, quantity]) => {
       const numPrice = Number(price);
       if (quantity === "0.00000000") {
@@ -56,7 +58,7 @@ const updateOrderBook = (data: ORDER_BOOK) => {
         orderBook.asks.set(numPrice, quantity);
       }
     });
-    // Rebuild sorted array from Map (faster than incremental updates for many changes)
+
     orderBook.asksArray = Array.from(orderBook.asks.entries()).sort((a, b) => a[0] - b[0]);
   }
   
